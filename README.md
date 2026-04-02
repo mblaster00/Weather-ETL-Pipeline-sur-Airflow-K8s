@@ -170,18 +170,6 @@ Enable the `weather_etl` DAG and trigger a first run manually to validate the fu
 
 ---
 
-## 🗺 Roadmap
-
-- [x] Project design & architecture
-- [ ] **Phase 1** — Terraform: VPC + GKE Autopilot + Cloud SQL
-- [ ] **Phase 2** — Helm: Airflow deployment + gitSync
-- [ ] **Phase 3** — First DAG with `PythonOperator` (end-to-end validation)
-- [ ] **Phase 4** — Refactor to `KubernetesPodOperator` (isolated pods)
-- [ ] **Phase 5** — Workload Identity + production hardening
-- [ ] **Bonus** — Grafana dashboard on collected weather data
-
----
-
 ## 📚 References
 
 - [Apache Airflow — Core Concepts](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/index.html)
