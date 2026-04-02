@@ -29,7 +29,7 @@ Built as a hands-on deep dive into **Data Engineering fundamentals** with a focu
 
 **What makes this non-trivial:**
 
-- Each ETL task runs in its own **ephemeral Kubernetes pod** (`KubernetesPodOperator`) — full isolation, independent scaling, no shared state
+- Each ETL task runs in its own **ephemeral Kubernetes pod** (`KubernetesPodOperator`) full isolation, independent scaling, no shared state
 - Infrastructure is **fully reproducible** from a single `terraform apply`
 - DAGs sync automatically from GitHub **no redeploy needed** to ship pipeline changes
 - Cloud SQL access via **Workload Identity** no static credentials anywhere in the cluster
@@ -170,18 +170,6 @@ Enable the `weather_etl` DAG and trigger a first run manually to validate the fu
 
 ---
 
-## 🗺 Roadmap
-
-- [x] Project design & architecture
-- [ ] **Phase 1** — Terraform: VPC + GKE Autopilot + Cloud SQL
-- [ ] **Phase 2** — Helm: Airflow deployment + gitSync
-- [ ] **Phase 3** — First DAG with `PythonOperator` (end-to-end validation)
-- [ ] **Phase 4** — Refactor to `KubernetesPodOperator` (isolated pods)
-- [ ] **Phase 5** — Workload Identity + production hardening
-- [ ] **Bonus** — Grafana dashboard on collected weather data
-
----
-
 ## 📚 References
 
 - [Apache Airflow — Core Concepts](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/index.html)
@@ -194,6 +182,6 @@ Enable the `weather_etl` DAG and trigger a first run manually to validate the fu
 
 <div align="center">
 
-Built to learn. Designed for production.
+Designed for production.
 
 </div>
