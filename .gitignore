@@ -1,0 +1,16 @@
+unknown.md
+
+# Terraform
+terraform.tfvars
+*.tfvars
+!*.tfvars.example
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+
+# Secrets
+*.env
+.env*
+!.env.example
+secrets/
