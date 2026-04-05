@@ -1,0 +1,24 @@
+# helm/values.yaml
+executor: KubernetesExecutor
+
+dags:
+  gitSync:
+    enabled: true
+    repo: git@github.com:mblaster00/weather-etl-airflow.git
+    branch: main
+    subPath: dags/
+    sshKeySecret: airflow-gitsync-ssh
+
+webserver:
+  defaultUser:
+    enabled: true
+    username: admin
+    existingSecret: airflow-webserver-secret
+    secretKey: password
+
+postgresql:
+  enabled: true
+  auth:
+    existingSecret: airflow-postgres-secret
+    secretKeys:
+      adminPasswordKey: password
