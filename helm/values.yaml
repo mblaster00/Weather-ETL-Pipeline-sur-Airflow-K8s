@@ -1,5 +1,25 @@
-# helm/values.yaml
 executor: KubernetesExecutor
+
+webserverSecretKeySecretName: airflow-webserver-secret-key
+webserverSecretKeySecretKey: webserver-secret-key
+
+webserver:
+  defaultUser:
+    enabled: true
+    role: Admin
+    username: meisterpod
+    email: email@example.com
+    firstName: firstname
+    lastName: lastname
+    password: "placeholder"
+
+secret:
+  - envName: AIRFLOW__WEBSERVER__SECRET_KEY
+    secretName: airflow-webserver-secret
+    secretKey: password
+
+data:
+  metadataSecretName: airflow-metadata-secret
 
 dags:
   gitSync:
@@ -9,16 +29,11 @@ dags:
     subPath: dags/
     sshKeySecret: airflow-gitsync-ssh
 
-webserver:
-  defaultUser:
-    enabled: true
-    username: admin
-    existingSecret: airflow-webserver-secret
-    secretKey: password
-
 postgresql:
   enabled: true
   auth:
     existingSecret: airflow-postgres-secret
     secretKeys:
       adminPasswordKey: password
+    database: airflow
+    username: postgres
