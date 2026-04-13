@@ -1,7 +1,10 @@
 from datetime import datetime, timedelta
+
 from airflow import DAG
-from airflow.providers.cncf.kubernetes.operators.pod import KubernetesPodOperator
-from airflow.providers.cncf.kubernetes.secret import Secret
+from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import (
+    KubernetesPodOperator,
+)
+from kubernetes.client import models as k8s
 
 IMAGE = "europe-west1-docker.pkg.dev/weather-etl-airflow/weather-etl/weather-etl:latest"
 
@@ -12,18 +15,49 @@ default_args = {
     "execution_timeout": timedelta(minutes=30),
 }
 
-# References to Kubernetes Secrets — no actual values here
-secrets = [
-    Secret("env", "OPENWEATHER_API_KEY", "weather-api-secret", "api_key"),
-    Secret("env", "CLOUDSQL_HOST", "cloudsql-secret", "host"),
-    Secret("env", "CLOUDSQL_DATABASE", "cloudsql-secret", "database"),
-    Secret("env", "CLOUDSQL_PASSWORD", "cloudsql-postgres-secret", "password"),
+env_vars = [
+    k8s.V1EnvVar(
+        name="OPENWEATHER_API_KEY",
+        value_from=k8s.V1EnvVarSource(
+            secret_key_ref=k8s.V1SecretKeySelector(
+                name="weather-api-secret",
+                key="api_key",
+            )
+        ),
+    ),
+    k8s.V1EnvVar(
+        name="CLOUDSQL_HOST",
+        value_from=k8s.V1EnvVarSource(
+            secret_key_ref=k8s.V1SecretKeySelector(
+                name="cloudsql-secret",
+                key="host",
+            )
+        ),
+    ),
+    k8s.V1EnvVar(
+        name="CLOUDSQL_DATABASE",
+        value_from=k8s.V1EnvVarSource(
+            secret_key_ref=k8s.V1SecretKeySelector(
+                name="cloudsql-secret",
+                key="database",
+            )
+        ),
+    ),
+    k8s.V1EnvVar(
+        name="CLOUDSQL_PASSWORD",
+        value_from=k8s.V1EnvVarSource(
+            secret_key_ref=k8s.V1SecretKeySelector(
+                name="cloudsql-postgres-secret",
+                key="password",
+            )
+        ),
+    ),
 ]
 
 with DAG(
     dag_id="weather_etl",
     description="Hourly weather ETL pipeline — OpenWeatherMap to Cloud SQL",
-    schedule="@hourly",
+    schedule_interval="@hourly",
     start_date=datetime(2024, 1, 1),
     catchup=False,
     default_args=default_args,
@@ -36,7 +70,7 @@ with DAG(
         namespace="airflow",
         image=IMAGE,
         cmds=["python", "-m", "utils.extract"],
-        secrets=secrets,
+        env_vars=env_vars,
         service_account_name="airflow-pods-ksa",
         is_delete_operator_pod=True,
         get_logs=True,
@@ -48,7 +82,7 @@ with DAG(
         namespace="airflow",
         image=IMAGE,
         cmds=["python", "-m", "utils.transform"],
-        secrets=secrets,
+        env_vars=env_vars,
         service_account_name="airflow-pods-ksa",
         is_delete_operator_pod=True,
         get_logs=True,
@@ -60,7 +94,7 @@ with DAG(
         namespace="airflow",
         image=IMAGE,
         cmds=["python", "-m", "utils.load"],
-        secrets=secrets,
+        env_vars=env_vars,
         service_account_name="airflow-pods-ksa",
         is_delete_operator_pod=True,
         get_logs=True,
