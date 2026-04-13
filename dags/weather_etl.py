@@ -17,6 +17,15 @@ default_args = {
 
 env_vars = [
     k8s.V1EnvVar(
+        name="CLOUDSQL_PASSWORD",
+        value_from=k8s.V1EnvVarSource(
+            secret_key_ref=k8s.V1SecretKeySelector(
+                name="cloudsql-postgres-secret",
+                key="password",
+            )
+        ),
+    ),
+    k8s.V1EnvVar(
         name="OPENWEATHER_API_KEY",
         value_from=k8s.V1EnvVarSource(
             secret_key_ref=k8s.V1SecretKeySelector(

@@ -13,9 +13,15 @@ CLOUDSQL_HOST=$(gcloud secrets versions access latest --secret="cloudsql-host" -
 CLOUDSQL_DB=$(gcloud secrets versions access latest --secret="cloudsql-database" --project=$PROJECT_ID)
 WEBSERVER_PASSWORD=$(gcloud secrets versions access latest --secret="airflow-webserver-password" --project=$PROJECT_ID)
 POSTGRES_PASSWORD=$(gcloud secrets versions access latest --secret="airflow-postgres-password" --project=$PROJECT_ID)
+CLOUDSQL_PASSWORD=$(gcloud secrets versions access latest --secret="cloudsql-postgres-password" --project=$PROJECT_ID)
 echo "All secrets pulled successfully."
 
 echo "Injecting into Kubernetes Secrets..."
+
+kubectl create secret generic cloudsql-postgres-secret \
+  --from-literal=password=$CLOUDSQL_PASSWORD \
+  --namespace airflow \
+  --dry-run=client -o yaml | kubectl apply -f -
 
 kubectl create secret generic weather-api-secret \
   --from-literal=api_key=$API_KEY \

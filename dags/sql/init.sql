@@ -23,7 +23,6 @@ CREATE TABLE IF NOT EXISTS weather_data (
     description VARCHAR(255),
     recorded_at TIMESTAMP NOT NULL,
     created_at  TIMESTAMP DEFAULT NOW(),
-
     UNIQUE (city, recorded_at)
 );
 

@@ -18,6 +18,7 @@ def load():
         host=os.environ["CLOUDSQL_HOST"],
         database=os.environ["CLOUDSQL_DATABASE"],
         user="postgres",
+        password=os.environ["CLOUDSQL_PASSWORD"],
     )
 
     with conn.cursor() as cur:
