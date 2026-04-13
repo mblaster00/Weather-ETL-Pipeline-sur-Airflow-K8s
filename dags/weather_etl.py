@@ -5,7 +5,9 @@ import os
 import psycopg2
 
 from airflow import DAG
+from airflow.models import Variable
 from airflow.operators.python import PythonOperator
+from airflow.providers.postgres.hooks.postgres import PostgresHook
 
 default_args = {
     "owner": "omar",
@@ -14,7 +16,7 @@ default_args = {
 }
 
 def extract(**context):
-    api_key = os.environ.get("OPENWEATHER_API_KEY", "test")
+    api_key = Variable.get("openweather_api_key")
     response = requests.get(
         "https://api.openweathermap.org/data/2.5/weather",
         params={"q": "Paris", "appid": api_key, "units": "metric"}
@@ -37,6 +39,19 @@ def transform(**context):
 
 def load(**context):
     data = context["ti"].xcom_pull(key="transformed_data", task_ids="transform_data")
+
+    hook = PostgresHook(postgres_conn_id="postgres_weather")
+    hook.run("""
+        INSERT INTO weather_data (city, temperature, humidity, description, recorded_at)
+        VALUES (%s, %s, %s, %s, %s)
+        ON CONFLICT (city, recorded_at) DO NOTHING
+    """, parameters=(
+        data["city"],
+        data["temperature"],
+        data["humidity"],
+        data["description"],
+        datetime.fromtimestamp(data["recorded_at"]),
+    ))
     print(f"Load successful — {data['city']} inserted into PostgreSQL")
 
 with DAG(
