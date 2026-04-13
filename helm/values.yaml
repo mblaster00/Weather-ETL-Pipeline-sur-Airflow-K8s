@@ -3,15 +3,18 @@ executor: KubernetesExecutor
 webserverSecretKeySecretName: airflow-webserver-secret-key
 webserverSecretKeySecretKey: webserver-secret-key
 
+extraPipPackages:
+  - "apache-airflow-providers-cncf-kubernetes==8.0.0"
+
 webserver:
   defaultUser:
     enabled: true
     role: Admin
-    username: username
+    username: meisterpod
     email: email@example.com
     firstName: firstname
     lastName: lastname
-    password: "password"
+    password: "placeholder"
 
 secret:
   - envName: AIRFLOW__WEBSERVER__SECRET_KEY
@@ -24,7 +27,7 @@ data:
 dags:
   gitSync:
     enabled: true
-    repo: git@github.com:mblaster00/Weather-ETL-Pipeline-sur-Airflow-K8s.git
+    repo: git@github.com:mblaster00/weather-etl-pipeline-sur-airflow-k8s.git
     branch: main
     subPath: dags/
     sshKeySecret: airflow-gitsync-ssh
