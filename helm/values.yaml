@@ -1,10 +1,10 @@
 executor: KubernetesExecutor
 
+airflowVersion: "2.9.3"
+defaultAirflowTag: "2.9.3"
+
 webserverSecretKeySecretName: airflow-webserver-secret-key
 webserverSecretKeySecretKey: webserver-secret-key
-
-extraPipPackages:
-  - "apache-airflow-providers-cncf-kubernetes==10.16.0"
 
 webserver:
   defaultUser:
