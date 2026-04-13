@@ -1,12 +1,15 @@
 executor: KubernetesExecutor
 
-airflowVersion: "2.9.3"
-defaultAirflowTag: "2.9.3"
+airflowVersion: "2.11.0"
+defaultAirflowTag: "2.11.0"
 
 webserverSecretKeySecretName: airflow-webserver-secret-key
 webserverSecretKeySecretKey: webserver-secret-key
 
 webserver:
+  startupProbe:
+    failureThreshold: 30
+    periodSeconds: 20
   defaultUser:
     enabled: true
     role: Admin
@@ -31,6 +34,9 @@ dags:
     branch: main
     subPath: dags/
     sshKeySecret: airflow-gitsync-ssh
+
+triggerer:
+  enabled: false
 
 postgresql:
   enabled: true
