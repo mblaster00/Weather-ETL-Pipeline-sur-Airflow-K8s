@@ -3,6 +3,9 @@ executor: KubernetesExecutor
 webserverSecretKeySecretName: airflow-webserver-secret-key
 webserverSecretKeySecretKey: webserver-secret-key
 
+extraPipPackages:
+  - "apache-airflow-providers-cncf-kubernetes==10.16.0"
+
 webserver:
   defaultUser:
     enabled: true
