@@ -24,7 +24,7 @@ data:
 dags:
   gitSync:
     enabled: true
-    repo: git@github.com:mblaster00/weather-etl-airflow.git
+    repo: git@github.com:mblaster00/Weather-ETL-Pipeline-sur-Airflow-K8s.git
     branch: main
     subPath: dags/
     sshKeySecret: airflow-gitsync-ssh
