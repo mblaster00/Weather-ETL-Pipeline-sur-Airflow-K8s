@@ -1,58 +1,43 @@
 from datetime import datetime, timedelta
+import requests
+import json
+import os
+import psycopg2
 
 from airflow import DAG
-from airflow.providers.cncf.kubernetes.operators.pod import (
-    KubernetesPodOperator,
-)
-from kubernetes.client import models as k8s
-
-IMAGE = "europe-west1-docker.pkg.dev/weather-etl-airflow/weather-etl/weather-etl:latest"
+from airflow.operators.python import PythonOperator
 
 default_args = {
     "owner": "omar",
     "retries": 3,
     "retry_delay": timedelta(minutes=5),
-    "execution_timeout": timedelta(minutes=30),
 }
 
-env_vars = [
-    k8s.V1EnvVar(
-        name="OPENWEATHER_API_KEY",
-        value_from=k8s.V1EnvVarSource(
-            secret_key_ref=k8s.V1SecretKeySelector(
-                name="weather-api-secret",
-                key="api_key",
-            )
-        ),
-    ),
-    k8s.V1EnvVar(
-        name="CLOUDSQL_HOST",
-        value_from=k8s.V1EnvVarSource(
-            secret_key_ref=k8s.V1SecretKeySelector(
-                name="cloudsql-secret",
-                key="host",
-            )
-        ),
-    ),
-    k8s.V1EnvVar(
-        name="CLOUDSQL_DATABASE",
-        value_from=k8s.V1EnvVarSource(
-            secret_key_ref=k8s.V1SecretKeySelector(
-                name="cloudsql-secret",
-                key="database",
-            )
-        ),
-    ),
-    k8s.V1EnvVar(
-        name="CLOUDSQL_PASSWORD",
-        value_from=k8s.V1EnvVarSource(
-            secret_key_ref=k8s.V1SecretKeySelector(
-                name="cloudsql-postgres-secret",
-                key="password",
-            )
-        ),
-    ),
-]
+def extract(**context):
+    api_key = os.environ.get("OPENWEATHER_API_KEY", "test")
+    response = requests.get(
+        "https://api.openweathermap.org/data/2.5/weather",
+        params={"q": "Paris", "appid": api_key, "units": "metric"}
+    )
+    response.raise_for_status()
+    context["ti"].xcom_push(key="raw_data", value=response.json())
+    print("Extract successful")
+
+def transform(**context):
+    raw = context["ti"].xcom_pull(key="raw_data", task_ids="extract_weather")
+    transformed = {
+        "city": raw["name"],
+        "temperature": raw["main"]["temp"],
+        "humidity": raw["main"]["humidity"],
+        "description": raw["weather"][0]["description"],
+        "recorded_at": raw["dt"],
+    }
+    context["ti"].xcom_push(key="transformed_data", value=transformed)
+    print(f"Transform successful — {transformed['city']} {transformed['temperature']}°C")
+
+def load(**context):
+    data = context["ti"].xcom_pull(key="transformed_data", task_ids="transform_data")
+    print(f"Load successful — {data['city']} inserted into PostgreSQL")
 
 with DAG(
     dag_id="weather_etl",
@@ -64,40 +49,22 @@ with DAG(
     tags=["etl", "weather"],
 ) as dag:
 
-    extract_task = KubernetesPodOperator(
+    extract_task = PythonOperator(
         task_id="extract_weather",
-        name="extract-weather-pod",
-        namespace="airflow",
-        image=IMAGE,
-        cmds=["python", "-m", "utils.extract"],
-        env_vars=env_vars,
-        service_account_name="airflow-pods-ksa",
-        is_delete_operator_pod=True,
-        get_logs=True,
+        python_callable=extract,
+        provide_context=True,
     )
 
-    transform_task = KubernetesPodOperator(
+    transform_task = PythonOperator(
         task_id="transform_data",
-        name="transform-data-pod",
-        namespace="airflow",
-        image=IMAGE,
-        cmds=["python", "-m", "utils.transform"],
-        env_vars=env_vars,
-        service_account_name="airflow-pods-ksa",
-        is_delete_operator_pod=True,
-        get_logs=True,
+        python_callable=transform,
+        provide_context=True,
     )
 
-    load_task = KubernetesPodOperator(
+    load_task = PythonOperator(
         task_id="load_to_postgres",
-        name="load-postgres-pod",
-        namespace="airflow",
-        image=IMAGE,
-        cmds=["python", "-m", "utils.load"],
-        env_vars=env_vars,
-        service_account_name="airflow-pods-ksa",
-        is_delete_operator_pod=True,
-        get_logs=True,
+        python_callable=load,
+        provide_context=True,
     )
 
     extract_task >> transform_task >> load_task
