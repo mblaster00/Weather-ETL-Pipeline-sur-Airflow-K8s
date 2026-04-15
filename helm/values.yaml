@@ -29,7 +29,7 @@ secret:
 data:
   metadataConnection:
     user: postgres
-    pass: lpmss1998
+    pass: "placeholder"
     host: airflow-postgresql.airflow
     port: 5432
     db: airflow
