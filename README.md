@@ -263,6 +263,9 @@ Open `http://localhost:8080`, unpause the `weather_etl` DAG and trigger a first 
 ### Artifact Registry
 ![Artifact Registry](screenshots/artifact-registry.png)
 
+### Cloud SQL
+![Cloud SQL](screenshots/cloud-sql.png)
+
 ---
 
 ## Project Structure
