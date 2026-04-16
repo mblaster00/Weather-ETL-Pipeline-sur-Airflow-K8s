@@ -15,7 +15,7 @@
 
 <br/>
 
-[Overview](#-overview) · [Architecture](#-architecture) · [Pipeline](#-pipeline) · [Security](#-security) · [Getting Started](#-getting-started) · [Project Structure](#-project-structure) · [Monitoring](#-monitoring) · [Lessons Learned](#-lessons-learned) · [Roadmap](#-roadmap)
+[Overview](#-overview) · [Architecture](#-architecture) · [Pipeline](#-pipeline) · [Security](#-security) · [Getting Started](#-getting-started) · [Project Structure](#-project-structure) · [Monitoring](#-monitoring) · [Roadmap](#-roadmap)
 
 </div>
 
