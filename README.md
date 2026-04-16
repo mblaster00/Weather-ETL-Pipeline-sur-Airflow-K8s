@@ -255,7 +255,13 @@ Open `http://localhost:8080`, unpause the `weather_etl` DAG and trigger a first 
 ![DAG graph view](screenshots/dag-graph.png)
 
 ### GKE Interface
-![GKE interface](screenshots/gke-interface.png)
+![GKE workloads](screenshots/gke-interface.png)
+
+### Secret Manager
+![Secret Manager](screenshots/secret-manager.png)
+
+### Artifact Registry
+![Artifact Registry](screenshots/artifact-registry.png)
 
 ---
 
