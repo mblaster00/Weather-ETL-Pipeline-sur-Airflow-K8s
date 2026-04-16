@@ -217,7 +217,7 @@ kubectl run psql-client \
   -- psql -h airflow-postgresql.airflow -U postgres -d airflow
 ```
 
-Run `init.sql` then exit with `\q`.
+Run `init.sql`.
 
 ---
 
