@@ -249,9 +249,9 @@ Open `http://localhost:8080`, unpause the `weather_etl` DAG and trigger a first 
 
 ---
 
-## Demo
+## Views
 
-### DAG graph view — all tasks successful
+### DAG graph with all tasks successful
 ![DAG graph view](screenshots/dag-graph.png)
 
 ### GKE Interface
